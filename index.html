@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DION's Colour App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      transition: background-color 0.8s ease; /* smooth fade */
+      background-color: #f2f2f2;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    input {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      margin-bottom: 1rem;
+      width: 250px;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      background-color: #333;
+      color: white;
+      cursor: pointer;
+      margin: 0.3rem;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+
+    p {
+      margin-top: 1rem;
+      font-style: italic;
+      color: #444;
+    }
+
+    #animalImage {
+      display: none;
+      margin-top: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      transition: opacity 0.5s ease;
+    }
+
+    #animalImage.fade-out {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dion's AI Image Generator Model</h1>
+  <input type="text" id="colorInput" placeholder="Type a color or animal..."/>
+  <div>
+    <button onclick="changeColor()">Generate</button>
+    <button onclick="refreshApp()">Refresh</button>
+  </div>
+  <p id="message"></p>
+  <img id="animalImage" alt="Animal Image">
+
+  <script>
+    let rainbowInterval = null;
+
+    function isValidColor(str) {
+      const s = new Option().style;
+      s.color = str;
+      return s.color !== '';
+    }
+
+    function randomColor() {
+      const r = Math.floor(Math.random()*256);
+      const g = Math.floor(Math.random()*256);
+      const b = Math.floor(Math.random()*256);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function startRainbow() {
+      const colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+      let i = 0;
+      if (rainbowInterval) clearInterval(rainbowInterval);
+      rainbowInterval = setInterval(() => {
+        document.body.style.backgroundColor = colors[i % colors.length];
+        i++;
+      }, 800);
+    }
+
+    function changeColor() {
+      const input = document.getElementById("colorInput").value.trim().toLowerCase();
+      const message = document.getElementById("message");
+      const animalImage = document.getElementById("animalImage");
+
+      // stop rainbow mode if running
+      if (rainbowInterval) {
+        clearInterval(rainbowInterval);
+        rainbowInterval = null;
+      }
+
+      // Hide the image by default
+      animalImage.style.display = "none";
+      animalImage.src = "";
+
+      if (input === "cat" || input === "cats") {
+        message.textContent = "🐱 Here's a cat for you!";
+        showAnimal("https://i1.sndcdn.com/avatars-hbeoycfx4EW5slTP-Vy4P5A-t240x240.jpg");
+      } 
+      else if (input === "dog") {
+        message.textContent = "🐶 Here's a dog for you!";
+        showAnimal("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmIHjZnFCAjdmUHldLW59lznOyygX-BE40Hg&s");
+      }
+      else if (["bird", "owl", "raven", "crow"].includes(input)) {
+        message.textContent = "🐦 Here's a bird for you!";
+        showAnimal("https://i.redd.it/pft6cxwuzofe1.jpeg");
+      }
+      else if (input === "any" || input === "rainbow") {
+        message.textContent = "🌈 Feeling all the colors...";
+        startRainbow();
+      }
+      else if (isValidColor(input)) {
+        document.body.style.backgroundColor = input;
+        message.textContent = "";
+      }
+      else if (input === "white" || input === "black") {
+        message.textContent = "BORING....... your wish is my command -_-";
+        document.body.style.backgroundColor = input;
+      } 
+      else {
+        const rand = randomColor();
+        document.body.style.backgroundColor = rand;
+        message.textContent = `I hear you, you’re feeling like ${rand} today.`;
+      }
+    }
+
+    function showAnimal(url) {
+      const animalImage = document.getElementById("animalImage");
+      animalImage.src = url;
+      animalImage.style.display = "block";
+      animalImage.classList.remove("fade-out");
+      animalImage.style.opacity = "1";
+    }
+
+    function refreshApp() {
+      const body = document.body;
+      const message = document.getElementById("message");
+      const input = document.getElementById("colorInput");
+      const animalImage = document.getElementById("animalImage");
+
+      if (rainbowInterval) {
+        clearInterval(rainbowInterval);
+        rainbowInterval = null;
+      }
+
+      // fade the background to neutral smoothly
+      body.style.backgroundColor = "#ffffff"; // small fade
+      setTimeout(() => {
+        body.style.backgroundColor = "#f2f2f2";
+      }, 400);
+
+      // clear inputs and messages
+      input.value = "";
+      message.textContent = "";
+
+      // fade out image before hiding
+      if (animalImage.style.display === "block") {
+        animalImage.classList.add("fade-out");
+        setTimeout(() => {
+          animalImage.style.display = "none";
+          animalImage.src = "";
+          animalImage.classList.remove("fade-out");
+        }, 500);
+      }
+    }
+  </script>
+</body>
+</html>
